@@ -1,36 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-// interface
-type Notifier interface {
-	Send(message string)
-}
-
-type EmailNotification struct {
-	EmailAddress string
-}
-
-func (e EmailNotification) Send(message string) {
-	fmt.Printf("📧 Emailga [%s] yuborildi: %s\n", e.EmailAddress, message)
-}
-
-type SMSNotification struct {
-	PhoneNumber string
-}
-
-func (s SMSNotification) Send(message string) {
-	fmt.Printf("📱 SMS raqam [%s] ga yuborildi: %s\n", s.PhoneNumber, message)
-}
-
-func sendNotification(n Notifier, msg string) {
-	n.Send(msg)
+func divide(a, b float64) (float64, error) {
+	if b == 0 {
+		return 0, errors.New("0 ga bo'lish mumkun emas")
+	}
+	return a / b, nil
 }
 
 func main() {
-	email := EmailNotification{EmailAddress: "user@example.com"}
-	sms := SMSNotification{PhoneNumber: "+998901234567"}
-
-	sendNotification(email, "Salom, bu email xabarnoma!")
-	sendNotification(sms, "Salom, bu SMS xabarnoma!")
+	result, err := divide(10, 2)
+	if err != nil {
+		fmt.Println("Xato:", err)
+	} else {
+		fmt.Println("Natija:", result)
+	}
 }
