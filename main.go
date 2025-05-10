@@ -1,41 +1,33 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
 
-type AuthError struct {
-	Message string
+	"golang.org/x/crypto/bcrypt"
+)
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
 }
 
-func (e AuthError) Error() string {
-	return e.Message
-}
-
-type User struct {
-	Name     string
-	Email    string
-	Password string
-}
-
-// In memory userlar bazasi
-var users = []User{
-	{Name: "Azizdev", Email: "azizdev.full@gmail.com", Password: "123456"},
-	{Name: "YoungDev", Email: "young@dev.com", Password: "abcdef"},
-}
-
-func login(email, password string) (User, error) {
-	for _, user := range users {
-		if user.Email == email && user.Password == password {
-			return user, nil
-		}
-	}
-	return User{}, AuthError{Message: "Email yoki parol noto‘g‘ri"}
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
 func main() {
-	user, err := login("azizdev.full@gmail.com", "123456")
+	password := "123456"
+
+	hash, err := hashPassword(password)
 	if err != nil {
-		fmt.Println("Xato:", err)
-		return
+		fmt.Println(err)
 	}
-	fmt.Println("Xush kelibsiz", user.Name)
+	fmt.Println("Hashed:", hash)
+
+	match := checkPasswordHash(password, hash)
+	fmt.Println("Tog'ri parol:", match)
+
+	match = checkPasswordHash("1234567", hash)
+	fmt.Println("Xato parol:", match)
 }

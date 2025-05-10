@@ -1,0 +1,24 @@
+# Go binary files
+/bin
+/obj
+
+# Dependency directories
+/vendor/
+
+# Go build artifacts
+*.exe
+*.test
+*.out
+
+# Go workspace
+/go-workspace/
+
+# IDEs
+.idea/
+.vscode/
+
+# Mac OS
+.DS_Store
+
+# Log files
+*.log
