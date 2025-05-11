@@ -3,10 +3,12 @@ package controllers
 import (
 	"myapp/database"
 	"myapp/models"
+	"myapp/requests"
 	"myapp/resources"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 func GetUsers(c *gin.Context) {
@@ -27,13 +29,38 @@ func GetUser(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req requests.CreateUserRequest
+
+	// Bind JSON body to struct
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
+
+	// Validate the request
+	if err := requests.ValidateCreateUserRequest(req); err != nil {
+		// Format errors
+		var validationErrors []resources.ValidationError
+		for _, e := range err.(validator.ValidationErrors) {
+			validationErrors = append(validationErrors, resources.ValidationError{
+				Field:   e.Field(),
+				Message: e.Tag(),
+			})
+		}
+
+		// Return custom error response
+		c.JSON(http.StatusBadRequest, resources.ErrorResponse{
+			Message:    "Validation failed",
+			Validation: validationErrors,
+		})
+		return
+	}
+
+	// Proceed with creating the user
+	user := models.User{Name: req.Name, Age: req.Age}
 	database.DB.Create(&user)
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully", "user": resources.NewUserResponse(user)})
+
+	c.JSON(http.StatusCreated, user)
 }
 
 // Update user
