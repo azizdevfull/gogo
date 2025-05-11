@@ -11,6 +11,35 @@ func main() {
 			"message": "pong " + name,
 		})
 	})
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Hello World",
+		})
+	})
+
+	r.POST("/", func(c *gin.Context) {
+		name := c.PostForm("name")
+		c.JSON(200, gin.H{
+			"message": "Received",
+			"name":    name,
+		})
+	})
+
+	r.PUT("/edit/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		c.JSON(200, gin.H{
+			"message": "Edit",
+			"id":      id,
+		})
+	})
+
+	r.DELETE("/delete/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		c.JSON(200, gin.H{
+			"message": "Delete",
+			"id":      id,
+		})
+	})
 
 	r.Run()
 }
