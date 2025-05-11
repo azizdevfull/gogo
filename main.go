@@ -19,6 +19,12 @@ func main() {
 
 	r.POST("/", func(c *gin.Context) {
 		name := c.PostForm("name")
+		if name == "" {
+			c.JSON(400, gin.H{
+				"error": "name is required",
+			})
+			return
+		}
 		c.JSON(200, gin.H{
 			"message": "Received",
 			"name":    name,
